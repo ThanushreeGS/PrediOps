@@ -1,0 +1,126 @@
+{
+  "lead_time": {
+    "per_incident": [
+      {
+        "rack_id": "rack-B2",
+        "resource": "storage_pct",
+        "event_date": "2026-05-09",
+        "first_correct_warning_date": "2026-01-17",
+        "lead_time_days": 112,
+        "lead_time_weeks": 16.0
+      },
+      {
+        "rack_id": "rack-C3",
+        "resource": "network_mbps",
+        "event_date": "2026-09-08",
+        "first_correct_warning_date": "2026-02-07",
+        "lead_time_days": 213,
+        "lead_time_weeks": 30.4
+      },
+      {
+        "rack_id": "rack-C3",
+        "resource": "power_kw",
+        "event_date": "2026-05-25",
+        "first_correct_warning_date": "2026-02-07",
+        "lead_time_days": 107,
+        "lead_time_weeks": 15.3
+      },
+      {
+        "rack_id": "rack-C3",
+        "resource": "storage_pct",
+        "event_date": "2025-10-29",
+        "first_correct_warning_date": null,
+        "lead_time_days": null,
+        "lead_time_weeks": null
+      },
+      {
+        "rack_id": "rack-C3",
+        "resource": "thermal_c",
+        "event_date": "2026-06-22",
+        "first_correct_warning_date": "2026-05-02",
+        "lead_time_days": 51,
+        "lead_time_weeks": 7.3
+      }
+    ]
+  },
+  "change_detection": {
+    "regime_change_recall": 0.4,
+    "n_regime_changes": 5,
+    "false_alarm_rate_on_spikes": 0.0,
+    "n_transient_spikes": 4,
+    "details": [
+      {
+        "rack_id": "rack-A1",
+        "resource": "network_mbps",
+        "event_type": "transient_spike",
+        "event_date": "2026-02-01 00:00:00",
+        "detected_by_model": null,
+        "correctly_ignored": true
+      },
+      {
+        "rack_id": "rack-A1",
+        "resource": "storage_pct",
+        "event_type": "regime_change",
+        "event_date": "2026-05-27 00:00:00",
+        "detected_by_model": false,
+        "correctly_ignored": null
+      },
+      {
+        "rack_id": "rack-A1",
+        "resource": "storage_pct",
+        "event_type": "transient_spike",
+        "event_date": "2026-03-28 00:00:00",
+        "detected_by_model": null,
+        "correctly_ignored": true
+      },
+      {
+        "rack_id": "rack-A1",
+        "resource": "vm_count",
+        "event_type": "regime_change",
+        "event_date": "2026-05-27 00:00:00",
+        "detected_by_model": true,
+        "correctly_ignored": null
+      },
+      {
+        "rack_id": "rack-B2",
+        "resource": "power_kw",
+        "event_type": "regime_change",
+        "event_date": "2026-07-26 00:00:00",
+        "detected_by_model": false,
+        "correctly_ignored": null
+      },
+      {
+        "rack_id": "rack-B2",
+        "resource": "thermal_c",
+        "event_type": "regime_change",
+        "event_date": "2026-07-26 00:00:00",
+        "detected_by_model": true,
+        "correctly_ignored": null
+      },
+      {
+        "rack_id": "rack-C3",
+        "resource": "network_mbps",
+        "event_type": "regime_change",
+        "event_date": "2026-08-30 00:00:00",
+        "detected_by_model": false,
+        "correctly_ignored": null
+      },
+      {
+        "rack_id": "rack-C3",
+        "resource": "thermal_c",
+        "event_type": "transient_spike",
+        "event_date": "2025-12-08 00:00:00",
+        "detected_by_model": null,
+        "correctly_ignored": true
+      },
+      {
+        "rack_id": "rack-C3",
+        "resource": "vm_count",
+        "event_type": "transient_spike",
+        "event_date": "2026-04-27 00:00:00",
+        "detected_by_model": null,
+        "correctly_ignored": true
+      }
+    ]
+  }
+}

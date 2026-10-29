@@ -1,0 +1,10 @@
+rack_id,tenant_id,event_type,resource,day_index,date,description
+rack-A1,tenant-nimbus,regime_change,storage_pct,210,2026-05-27,tenant-nimbus onboarded a new analytics workload
+rack-A1,tenant-nimbus,regime_change,vm_count,210,2026-05-27,VM fleet scaled up alongside analytics workload
+rack-A1,tenant-nimbus,transient_spike,network_mbps,95,2026-02-01,one-off batch export spike (self-resolved)
+rack-A1,tenant-forge,transient_spike,storage_pct,150,2026-03-28,"temp log retention bug, rolled back (self-resolved)"
+rack-B2,tenant-orbital,regime_change,power_kw,270,2026-07-26,backup policy change: nightly full backups instead of incremental
+rack-C3,tenant-helios,regime_change,network_mbps,305,2026-08-30,seasonal traffic ramp (Q4 promotional event)
+rack-C3,tenant-helios,transient_spike,vm_count,180,2026-04-27,"short-lived load-test VMs, torn down after (self-resolved)"
+rack-B2,facility-shared,regime_change,thermal_c,270,2026-07-26,higher sustained load after backup-policy change raised rack intake temperature
+rack-C3,facility-shared,transient_spike,thermal_c,40,2025-12-08,"CRAC unit hiccup, auto-recovered (self-resolved)"

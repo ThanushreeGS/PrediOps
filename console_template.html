@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PrediOps</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+  <style>
+    :root {
+      --bg: #eef1f4;
+      --surf: #fff;
+      --ink: #14202b;
+      --mut: #566474;
+      --line: #d3dae2;
+      --red: #b5281d;
+      --redbg: #fbe9e7;
+      --amb: #8a5700;
+      --ambbg: #fcf0d4;
+      --grn: #1d6b4b;
+      --grnbg: #e1f1e8;
+      --blu: #1f4f9c;
+      --blubg: #e6eefb;
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0f1620;
+        --surf: #17212d;
+        --ink: #e8edf2;
+        --mut: #9aa8b6;
+        --line: #2a3746;
+        --red: #ff8a7e;
+        --redbg: #3a1e1b;
+        --amb: #f0b94d;
+        --ambbg: #35290f;
+        --grn: #6fcf9f;
+        --grnbg: #15301f;
+        --blu: #8db4ff;
+        --blubg: #17284a;
+        color-scheme: dark
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0f1620;
+      --surf: #17212d;
+      --ink: #e8edf2;
+      --mut: #9aa8b6;
+      --line: #2a3746;
+      --red: #ff8a7e;
+      --redbg: #3a1e1b;
+      --amb: #f0b94d;
+      --ambbg: #35290f;
+      --grn: #6fcf9f;
+      --grnbg: #15301f;
+      --blu: #8db4ff;
+      --blubg: #17284a;
+      color-scheme: dark
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.5 "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif
+    }
+
+    button,
+    input {
+      font: inherit;
+      color: inherit
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--blu);
+      outline-offset: 2px
+    }
+
+    .top {
+      display: flex;
+      gap: 16px;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 16px 24px 8px
+    }
+
+    .top h1 {
+      font-size: 20px;
+      margin: 0
+    }
+
+    .top p {
+      margin: 0;
+      color: var(--mut);
+      font-size: 14px
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 20px;
+      padding: 8px 24px 32px;
+      align-items: start
+    }
+
+    .rail {
+      position: sticky;
+      top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .filters {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--surf);
+      border-radius: 999px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-size: 14px
+    }
+
+    .chip[aria-pressed=true] {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink)
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: calc(100vh - 150px);
+      overflow: auto
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 6px 1fr auto;
+      gap: 10px;
+      text-align: left;
+      background: var(--surf);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px 10px 0;
+      cursor: pointer;
+      overflow: hidden
+    }
+
+    .row[aria-current=true] {
+      border-color: var(--blu);
+      box-shadow: 0 0 0 2px var(--blu)
+    }
+
+    .bar {
+      border-radius: 0 3px 3px 0
+    }
+
+    .s-URGENT .bar {
+      background: var(--red)
+    }
+
+    .s-WATCH .bar {
+      background: var(--amb)
+    }
+
+    .s-HEALTHY .bar {
+      background: var(--grn)
+    }
+
+    .row b {
+      display: block;
+      font-size: 15px
+    }
+
+    .row small {
+      color: var(--mut)
+    }
+
+    .run {
+      font-weight: 700;
+      font-size: 14px;
+      text-align: right;
+      white-space: nowrap
+    }
+
+    .s-URGENT .run {
+      color: var(--red)
+    }
+
+    .s-WATCH .run {
+      color: var(--amb)
+    }
+
+    .s-HEALTHY .run {
+      color: var(--grn)
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0
+    }
+
+    .brief {
+      background: var(--surf);
+      border: 1px solid var(--line);
+      border-left: 8px solid var(--grn);
+      border-radius: 8px;
+      padding: 18px 22px
+    }
+
+    .brief.s-URGENT {
+      border-left-color: var(--red)
+    }
+
+    .brief.s-WATCH {
+      border-left-color: var(--amb)
+    }
+
+    .brief .tag {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      margin-bottom: 8px
+    }
+
+    .s-URGENT .tag {
+      background: var(--redbg);
+      color: var(--red)
+    }
+
+    .s-WATCH .tag {
+      background: var(--ambbg);
+      color: var(--amb)
+    }
+
+    .s-HEALTHY .tag {
+      background: var(--grnbg);
+      color: var(--grn)
+    }
+
+    .brief h2 {
+      margin: 0;
+      font-size: clamp(20px, 2.6vw, 28px);
+      line-height: 1.25;
+      max-width: 60ch
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .card {
+      background: var(--surf);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px 20px;
+      min-width: 0
+    }
+
+    .card h3 {
+      margin: 0 0 4px;
+      font-size: 18px
+    }
+
+    .card .sub {
+      margin: 0 0 12px;
+      color: var(--mut);
+      font-size: 14px
+    }
+
+    .cause {
+      border-top: 4px solid var(--blu)
+    }
+
+    .act {
+      border-top: 4px solid var(--ink)
+    }
+
+    .share {
+      display: grid;
+      grid-template-columns: 120px 1fr 44px;
+      gap: 8px;
+      align-items: center;
+      font-size: 14px;
+      margin: 6px 0
+    }
+
+    .track {
+      height: 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      overflow: hidden
+    }
+
+    .fill {
+      height: 100%;
+      background: var(--blu)
+    }
+
+    .share.top .fill {
+      background: var(--red)
+    }
+
+    .ev {
+      background: var(--blubg);
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin: 12px 0 0;
+      font-size: 14px
+    }
+
+    .kv {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin: 10px 0 12px
+    }
+
+    .kv div {
+      font-size: 14px;
+      color: var(--mut)
+    }
+
+    .kv b {
+      display: block;
+      color: var(--ink);
+      font-size: 17px
+    }
+
+    .steps {
+      list-style: none;
+      margin: 8px 0;
+      padding: 0
+    }
+
+    .steps li {
+      display: flex;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .steps input {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      flex: none
+    }
+
+    .steps li.done span {
+      text-decoration: line-through;
+      color: var(--mut)
+    }
+
+    .planb {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--mut)
+    }
+
+    .prog {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--blu)
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--mut);
+      margin: 8px 0 0
+    }
+
+    .chartwrap {
+      overflow-x: auto
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      min-width: 560px;
+      height: auto
+    }
+
+    .what {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-top: 12px
+    }
+
+    .what input[type=range] {
+      width: 100%;
+      accent-color: var(--blu)
+    }
+
+    .out {
+      background: var(--blubg);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 15px
+    }
+
+    .out b {
+      font-size: 20px
+    }
+
+    @media (max-width:900px) {
+      .app {
+        grid-template-columns: 1fr;
+        padding: 8px 14px 24px
+      }
+
+      .rail {
+        position: static
+      }
+
+      .list {
+        max-height: none
+      }
+
+      .two,
+      .what {
+        grid-template-columns: 1fr
+      }
+
+      .top {
+        padding: 14px 14px 4px
+      }
+    }
+
+    .live {
+      margin: 0 24px 8px;
+      background: var(--surf);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+      font-size: 14px
+    }
+
+    .live button,
+    .live select {
+      border: 1px solid var(--line);
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer
+    }
+
+    .live button.on {
+      background: var(--blu);
+      color: var(--bg);
+      border-color: var(--blu)
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--mut);
+      display: inline-block
+    }
+
+    .dot.on {
+      background: var(--grn)
+    }
+
+    .live .grow {
+      flex: 1 1 260px
+    }
+
+    .chg {
+      color: var(--amb);
+      font-weight: 700
+    }
+
+    .err {
+      color: var(--red);
+      font-weight: 700
+    }
+
+    .live details {
+      flex-basis: 100%
+    }
+
+    .live details>div {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      align-items: center
+    }
+
+    table.aud {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 14px
+    }
+
+    table.aud td,
+    table.aud th {
+      border-bottom: 1px solid var(--line);
+      padding: 4px 8px;
+      text-align: left
+    }
+
+    @media (max-width:900px) {
+      .live {
+        margin: 0 14px 8px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top">
+    <h1>PrediOps</h1>
+    <p id="asof"></p>
+  </div>
+  <div class="live" id="live"></div>
+  <div class="app">
+    <aside class="rail">
+      <div class="filters" id="filters" role="group" aria-label="Filter series"></div>
+      <div class="list" id="list"></div>
+    </aside>
+    <main id="main"></main>
+  </div>
+  <script>
+    const D =/*DATA*/null;
+    let R = []; const sortR = d => d.results.slice().sort((a, b) => a.urgency.score - b.urgency.score || (a.urgency.margin_eta_days ?? 1e9) - (b.urgency.margin_eta_days ?? 1e9));
+    const RES = { storage_pct: 'Storage', power_kw: 'Power', thermal_c: 'Temperature', network_mbps: 'Network', vm_count: 'Virtual machines' };
+    const TAG = { URGENT: 'Act now', WATCH: 'Plan ahead', HEALTHY: 'Stable' };
+    let sel = 0, filter = 'ALL', reduce = 0;
+    const $ = s => document.querySelector(s);
+    const fmt = (v, u) => (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : (+v).toFixed(1)) + ' ' + u;
+    const addDays = (d, n) => { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + Math.round(n)); return t.toISOString().slice(0, 10) };
+    const breached = r => r.forecast.status === 'ok' && r.forecast.current_value >= r.safety_margin;
+    const nm = r => RES[r.resource] + ' on ' + r.rack_id;
+    function runway(r) { const e = r.urgency.margin_eta_days; if (breached(r)) return 'Over margin'; if (e == null) return 'No growth'; return e >= 365 ? (e / 365).toFixed(1) + ' yr' : Math.round(e) + ' days' }
+    let SERVER = false, CK = {}, META = null, prev = {}, lastChanges = null, connected = false, busy = '';
+    const keyOf = r => r.rack_id + '|' + r.resource;
+    const store = {
+      get(k) { if (CK[k]) return CK[k]; if (!SERVER) { try { return JSON.parse(localStorage.getItem('ck:' + k) || '[]') } catch (e) { } } return [] },
+      set(k, v) { CK[k] = v; if (SERVER) fetch('/api/checklists', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: k, done: v }) }).catch(() => { }); else { try { localStorage.setItem('ck:' + k, JSON.stringify(v)) } catch (e) { } } }
+    };
+
+    function headline(r) {
+      const c = r.cause_analysis, d = r.recommended_decision, u = r.urgency.code;
+      if (u === 'HEALTHY') return r.urgency.margin_eta_days == null ? `${nm(r)} is not growing toward its safety margin. No action needed.` : `${nm(r)} has about ${runway(r)} before it reaches the safety margin. No action needed now.`;
+      const who = c.primary_driver.startsWith('facility') ? 'Shared facility load' : c.primary_driver;
+      const when = d.action_deadline_days === 0 ? 'today' : 'by ' + d.action_deadline_date;
+      const state = breached(r) ? `${nm(r)} is already past its safety margin.` : `${nm(r)} reaches its safety margin in about ${Math.round(r.urgency.margin_eta_days)} days.`;
+      return `${state} ${who}${c.driver_share_pct ? ` drives ${Math.round(c.driver_share_pct)}% of the growth` : ' is the main driver'}. ${d.title} ${when}.`;
+    }
+
+    function renderList() {
+      const counts = { URGENT: 0, WATCH: 0, HEALTHY: 0 }; R.forEach(r => counts[r.urgency.code]++);
+      $('#filters').innerHTML = [['ALL', 'All ' + R.length], ['URGENT', `Act now ${counts.URGENT}`], ['WATCH', `Plan ahead ${counts.WATCH}`], ['HEALTHY', `Stable ${counts.HEALTHY}`]]
+        .map(([k, l]) => `<button class="chip" aria-pressed="${filter === k}" data-f="${k}">${l}</button>`).join('');
+      $('#list').innerHTML = R.map((r, i) => ({ r, i })).filter(o => filter === 'ALL' || o.r.urgency.code === filter).map(({ r, i }) =>
+        `<button class="row s-${r.urgency.code}" data-i="${i}" ${i === sel ? 'aria-current="true"' : ''}><span class="bar"></span><span><b>${RES[r.resource]}</b><small>${r.rack_id} · ${TAG[r.urgency.code]}</small></span><span class="run">${runway(r)}</span></button>`).join('') || '<p class="note">No series match this filter.</p>';
+    }
+
+    function chart(r) {
+      const f = r.forecast; if (f.status !== 'ok') return '<p class="note">Not enough data to forecast.</p>';
+      const hv = r.history.values, hd = r.history.dates, n = hv.length, H = 120, W = 720, Ht = 280, m = { l: 56, r: 14, t: 14, b: 30 };
+      const cur = f.current_value, s = f.daily_growth_rate, [slo, shi] = f.growth_rate_range, k = 1 - reduce / 100;
+      const proj = (sl, d) => cur + sl * k * d;
+      let ymax = Math.max(Math.max(...hv), r.safety_margin, proj(shi, H)) * 1.06;
+      const limVisible = r.limit <= ymax * 1.15; if (limVisible) ymax = Math.max(ymax, r.limit * 1.04);
+      const ymin = Math.min(...hv, r.safety_margin) * 0.94;
+      const X = i => m.l + i / (n - 1 + H) * (W - m.l - m.r), Y = v => Ht - m.b - (v - ymin) / (ymax - ymin) * (Ht - m.t - m.b);
+      const line = a => a.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1)).join('');
+      const hist = hv.map((v, i) => [i, v]);
+      const band = [[n - 1, cur], [n - 1 + H, proj(shi, H)], [n - 1 + H, proj(slo, H)]];
+      const base = [[n - 1, cur], [n - 1 + H, cur + s * H]];
+      let g = '';
+      for (let t = 0; t <= 3; t++) { const v = ymin + (ymax - ymin) * t / 3; g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${m.l - 6}" y="${Y(v) + 4}" text-anchor="end" font-size="12" fill="var(--mut)">${v >= 1000 ? Math.round(v).toLocaleString() : v.toFixed(0)}</text>` }
+      const rs = hd.indexOf(f.regime_start_date), cp = r.change_points.length ? r.change_points[r.change_points.length - 1].date : null, ci = cp ? hd.indexOf(cp) : -1;
+      g += `<path d="${line(band)}Z" fill="var(--blu)" opacity=".15"/>`;
+      g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(r.safety_margin)}" y2="${Y(r.safety_margin)}" stroke="var(--amb)" stroke-width="2" stroke-dasharray="6 4"/><text x="${m.l + 4}" y="${Y(r.safety_margin) - 5}" font-size="12" fill="var(--amb)" font-weight="700">Safety margin ${fmt(r.safety_margin, r.unit)}</text>`;
+      if (limVisible) g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(r.limit)}" y2="${Y(r.limit)}" stroke="var(--red)" stroke-width="2"/><text x="${m.l + 4}" y="${Y(r.limit) - 5}" font-size="12" fill="var(--red)" font-weight="700">Hard limit ${fmt(r.limit, r.unit)}</text>`;
+      if (ci >= 0) g += `<line x1="${X(ci)}" x2="${X(ci)}" y1="${m.t}" y2="${Ht - m.b}" stroke="var(--mut)" stroke-dasharray="2 4"/><text x="${X(ci) + 4}" y="${Ht - m.b - 6}" font-size="12" fill="var(--mut)">Growth changed ${cp}</text>`;
+      g += `<path d="${line(hist)}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
+      if (reduce > 0) g += `<path d="${line(base)}" fill="none" stroke="var(--mut)" stroke-width="2" stroke-dasharray="5 4"/>`;
+      g += `<path d="${line([[n - 1, cur], [n - 1 + H, proj(s, H)]])}" fill="none" stroke="var(--blu)" stroke-width="3"/>`;
+      g += `<line x1="${X(n - 1)}" x2="${X(n - 1)}" y1="${m.t}" y2="${Ht - m.b}" stroke="var(--ink)" stroke-opacity=".4"/><circle cx="${X(n - 1)}" cy="${Y(cur)}" r="5" fill="var(--ink)"/>`;
+      const as = f.as_of_date;
+      g += [[0, hd[0]], [n - 1, as + ' (latest)'], [n - 1 + H, addDays(as, H)]].map(([i, t], j) => `<text x="${X(i)}" y="${Ht - 8}" font-size="12" fill="var(--mut)" text-anchor="${j == 0 ? 'start' : j == 2 ? 'end' : 'middle'}">${t}</text>`).join('');
+      return `<div class="chartwrap"><svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="${nm(r)}: history and forecast against safety margin">${g}</svg></div>`;
+    }
+
+    function whatMsg(r) {
+      const f = r.forecast;
+      const cur = f.current_value, s = f.daily_growth_rate, k = 1 - reduce / 100, gap = r.safety_margin - cur;
+      let msg;
+      if (gap <= 0) msg = `<b>${fmt(-gap, r.unit)} over the margin.</b><br>Slowing growth cannot fix this. The action has to free at least that much.`;
+      else if (s <= 1e-6) msg = '<b>Not growing.</b><br>No margin crossing is forecast.';
+      else { const d0 = gap / s, d1 = gap / (s * k + 1e-9); msg = reduce === 0 ? `Margin reached in <b>${Math.round(d0)} days</b> (${addDays(f.as_of_date, d0)}) at today’s pace.` : `Margin reached in <b>${d1 > 1e5 ? 'never at this pace' : Math.round(d1) + ' days'}</b> (${d1 > 1e5 ? '-' : addDays(f.as_of_date, d1)}), up from ${Math.round(d0)} days. Gain: <b>+${d1 > 1e5 ? 'unbounded' : Math.round(d1 - d0)}</b> days.` }
+      return msg
+    }
+    function whatIf(r) {
+      if (r.forecast.status !== 'ok') return '';
+      return `<div class="what"><div><label for="rd"><b>If the action slows growth by <span id="rv">${reduce}</span>%</b></label><input id="rd" type="range" min="0" max="100" step="5" value="${reduce}"><p class="note">Drag to test how much slowdown buys the time you need. The blue line and band update.</p></div><div class="out" id="outbox" aria-live="polite">${whatMsg(r)}</div></div>`;
+    }
+
+    function renderMain() {
+      const r = R[sel], c = r.cause_analysis, d = r.recommended_decision, u = r.urgency, f = r.forecast;
+      const key = r.rack_id + '|' + r.resource, done = store.get(key);
+      const shares = r.attribution.length ? r.attribution.map((a, i) => `<div class="share ${i === 0 ? 'top' : ''}"><span>${a.tenant_id.replace('tenant-', '')}</span><div class="track"><div class="fill" style="width:${a.share_of_rack_growth * 100}%"></div></div><b>${Math.round(a.share_of_rack_growth * 100)}%</b></div>`).join('') : `<p class="note">${r.resource === 'thermal_c' ? 'Temperature is a shared physical property of the rack, so it is not attributed to one tenant.' : 'No tenant is growing meaningfully on this rack.'}</p>`;
+      const cp = c.latest_regime_change;
+      const ev = cp ? `<div class="ev"><b>Evidence:</b> growth rate changed on ${cp.date}, from ${cp.old_slope}/day to ${cp.new_slope}/day (${Math.round(cp.confidence * 100)}% confidence). The forecast uses only data since then.</div>` : `<div class="ev"><b>Evidence:</b> no sudden change in growth rate. Forecast uses the last ${f.regime_window_days || '-'} days.</div>`;
+      const ok = u.code !== 'HEALTHY';
+      $('#main').innerHTML = `
+  <section class="brief s-${u.code}"><span class="tag">${TAG[u.code]}</span><h2>${headline(r)}</h2></section>
+  <div class="two">
+   <section class="card cause"><h3>Why this is happening</h3><p class="sub">${c.category}: ${c.title}</p><p style="margin:0 0 8px">${c.summary}</p>
+     <p style="margin:12px 0 2px"><b>Who is driving growth on ${r.rack_id}</b></p>${shares}${ev}</section>
+   <section class="card act"><h3>${ok ? 'What to do' : 'What to do (nothing urgent)'}</h3><p class="sub">${d.title}</p>
+     <div class="kv"><div>Do it by<b>${d.action_deadline_days === 0 ? 'Today' : d.action_deadline_date}</b></div><div>Margin reached<b>${runway(r)}</b></div></div>
+     <p style="margin:0 0 6px">${d.action_summary}</p>
+     <p class="prog" id="prog"></p>
+     <ul class="steps">${d.operator_checklist.map((t, i) => `<li class="${done.includes(i) ? 'done' : ''}"><input type="checkbox" id="c${i}" data-c="${i}" ${done.includes(i) ? 'checked' : ''}><label for="c${i}"><span>${t}</span></label></li>`).join('')}</ul>
+     <details><summary>Detailed steps</summary><ol>${d.prescriptive_steps.map(t => `<li>${t}</li>`).join('')}</ol></details>
+     <p class="planb"><b>Expected effect:</b> ${d.expected_impact} <i>(rule-of-thumb estimate, test it below)</i><br><b>If that is blocked (plan B):</b> ${d.alternative_fallback}</p></section>
+  </div>
+  <section class="card"><h3>Forecast and what-if</h3><p class="sub">Black is history. Blue is the forecast with an 80% range.</p><div id="chartbox">${chart(r)}</div>${whatIf(r)}</section>${SERVER ? '<section class="card"><h3>Audit trail</h3><p class="sub">Recent forecast runs for this series, recorded with a hash of the data each one used.</p><div id="audbody" class="chartwrap">Loading...</div></section>' : ''}`;
+      loadAudit(r); const p = $('#prog'); p.textContent = `${done.length} of ${d.operator_checklist.length} steps done`;
+      const rg = $('#rd'); if (rg) rg.oninput = e => { reduce = +e.target.value; $('#rv').textContent = reduce; $('#chartbox').innerHTML = chart(R[sel]); $('#outbox').innerHTML = whatMsg(R[sel]) };
+    }
+
+    document.addEventListener('click', e => {
+      const f = e.target.closest('[data-f]'); if (f) { filter = f.dataset.f; renderList(); return }
+      const i = e.target.closest('[data-i]'); if (i) { sel = +i.dataset.i; reduce = 0; renderList(); renderMain(); return }
+    });
+    document.addEventListener('change', e => {
+      const c = e.target.closest('[data-c]'); if (!c) return;
+      const r = R[sel], key = r.rack_id + '|' + r.resource; let a = store.get(key); const i = +c.dataset.c;
+      a = c.checked ? [...new Set([...a, i])] : a.filter(x => x !== i); store.set(key, a); renderMain();
+    });
+
+    function setData(d) {
+      const old = prev, selKey = R[sel] ? keyOf(R[sel]) : null;
+      R = sortR(d); META = d.meta || null;
+      const now = {}; R.forEach(r => now[keyOf(r)] = r.urgency.code);
+      const ch = []; if (Object.keys(old).length) R.forEach(r => { const k = keyOf(r); if (old[k] && old[k] !== now[k]) ch.push(`${nm(r)}: ${TAG[old[k]]} to ${TAG[now[k]]}`) });
+      prev = now; if (ch.length) lastChanges = { at: new Date().toLocaleTimeString(), list: ch };
+      const i = selKey ? R.findIndex(r => keyOf(r) === selKey) : -1; sel = i >= 0 ? i : 0;
+      $('#asof').textContent = 'Data through ' + R[0].forecast.as_of_date + '. Read-only: this console changes nothing in the facility.';
+      renderLive(); renderList();
+      if (!(document.activeElement && document.activeElement.id === 'rd')) renderMain();
+    }
+    function loadAudit(r) {
+      if (!SERVER) return;
+      fetch(`/api/audit?rack=${r.rack_id}&resource=${r.resource}&limit=5`).then(x => x.json()).then(a => {
+        const b = $('#audbody'); if (!b) return;
+        b.innerHTML = a.length ? `<table class="aud"><tr><th>Run (UTC)</th><th>Data through</th><th>Days to margin</th><th>Data hash</th></tr>${a.map(x => `<tr><td>${x.run.slice(0, 19).replace('T', ' ')}</td><td>${x.data_through}</td><td>${x.eta_days ?? 'no growth'}</td><td>${x.data_hash}</td></tr>`).join('')}</table>` : 'No runs recorded yet.'
+      }).catch(() => { });
+    }
+    function renderLive() {
+      const el = $('#live');
+      if (!SERVER) { el.innerHTML = '<span class="dot"></span><span>Static snapshot. Start <b>server.py</b> for live updates, simulation and shared checklists.</span>'; return }
+      if (!$('#lstat')) {
+        const T = Object.keys(META.tenants), res = [...new Set(Object.values(META.tenants).flat())];
+        el.innerHTML = `<span class="dot" id="ldot"></span><span class="grow" id="lstat"></span>
+     <button data-a="adv" data-n="1">+1 day</button><button data-a="adv" data-n="7">+7 days</button><button data-a="adv" data-n="30">+30 days</button>
+     <button data-a="auto" id="auto"></button><button data-a="reset">Reset data</button>
+     <details><summary>Simulate a workload surge</summary><div>
+      <select id="st">${T.map(t => `<option>${t}</option>`).join('')}</select>
+      <select id="sr">${res.map(t => `<option value="${t}">${RES[t] || t}</option>`).join('')}</select>
+      <select id="sf"><option>2</option><option selected>3</option><option>5</option></select> times faster growth
+      <button data-a="surge">Run 30 days with surge</button></div>
+      <p class="note">Appends 30 simulated days. After the surge the console should detect the change, name the driving tenant and escalate the action.</p></details>
+     <p class="note" id="lchg" style="flex-basis:100%;margin:0"></p>`;
+      }
+      $('#ldot').className = 'dot' + (connected ? ' on' : '');
+      $('#lstat').textContent = (busy || `${connected ? 'Live' : 'Reconnecting'}: data through ${META.data_through}, update #${META.version}, recomputed in ${META.run_ms} ms`);
+      const a = $('#auto'); a.textContent = 'Auto-advance: ' + (META.auto ? `on (every ${META.interval}s)` : 'off'); a.className = META.auto ? 'on' : '';
+      $('#lchg').innerHTML = lastChanges ? `<span class="chg">Changed at ${lastChanges.at}:</span> ${lastChanges.list.join('; ')}` : '';
+    }
+    async function post(path, body) {
+      busy = 'Recomputing...'; renderLive();
+      try {
+        const r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) }); const j = await r.json();
+        busy = ''; if (!j.ok) { busy = ''; $('#lstat').innerHTML = '<span class="err">' + (j.error || 'Request failed') + '</span>'; return }
+      }
+      catch (e) { busy = ''; $('#lstat').innerHTML = '<span class="err">Server not reachable</span>'; return }
+      await refresh();
+    }
+    const refresh = () => fetch('/api/results').then(r => r.json()).then(setData);
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-a]'); if (!b) return; const a = b.dataset.a;
+      if (a === 'adv') post('/api/advance', { days: +b.dataset.n });
+      if (a === 'auto') post('/api/live', { on: !META.auto, interval: 15 });
+      if (a === 'reset' && confirm('Discard simulated and ingested data and restore the original dataset?')) post('/api/reset');
+      if (a === 'surge') post('/api/advance', { days: 30, surge: { tenant: $('#st').value, resource: $('#sr').value, factor: +$('#sf').value } });
+    });
+    (async () => {
+      try { const h = await fetch('/api/health'); SERVER = h.ok && (await h.json()).ok === true } catch (e) { SERVER = false }
+      if (SERVER) {
+        try { CK = await (await fetch('/api/checklists')).json() } catch (e) { }
+        const es = new EventSource('/api/events'); es.onopen = () => { connected = true; META && renderLive() }; es.onerror = () => { connected = false; META && renderLive() }; es.onmessage = () => { if (!busy) refresh() };
+        await refresh(); connected = true; renderLive();
+      } else if (D) { setData(D); } else { $('#main').innerHTML = '<p class="note">No data. Run run_all.py or server.py.</p>' }
+    })();
+  </script>
+</body>
+
+</html>

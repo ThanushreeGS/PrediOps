@@ -1,0 +1,6 @@
+resource,limit,safety_margin,unit
+storage_pct,100.0,85.0,%
+power_kw,480.0,420.0,kW
+thermal_c,32.0,28.0,°C
+network_mbps,10000.0,8500.0,Mbps
+vm_count,400.0,360.0,VMs

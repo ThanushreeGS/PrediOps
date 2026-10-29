@@ -1,0 +1,6 @@
+rack_id,resource,event_date,value_at_event,safety_margin,description
+rack-B2,storage_pct,2026-05-09,85.02,85.0,storage_pct on rack-B2 crossed safety margin
+rack-C3,network_mbps,2026-09-08,8559.43,8500.0,network_mbps on rack-C3 crossed safety margin
+rack-C3,power_kw,2026-05-25,420.92,420.0,power_kw on rack-C3 crossed safety margin
+rack-C3,storage_pct,2025-10-29,90.0,85.0,storage_pct on rack-C3 crossed safety margin
+rack-C3,thermal_c,2026-06-22,28.1,28.0,thermal_c on rack-C3 crossed safety margin
